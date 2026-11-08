@@ -15,13 +15,15 @@ object frmAbout: TfrmAbout
     Width = 810
     Anchors = [akTop, akLeft, akRight, akBottom]
     Lines.Strings = (
-      'v3.3.4, Developed by Ted Smith (c) 2011-2023'
+      'v3.5.0, Developed by Ted Smith (c) 2011-2023 - Updates 2026 Chris Brooker (nzchris73)'
       ''
       'Home Page : http://www.quickhash-gui.org (First registered in 2011 on Sourceforge at http://sourceforge.net/projects/quickhash)'
       ''
-      'Github Page and Bug Tracker is : https://github.com/tedsmith/quickhash'
+      'Original Github Page and Bug Tracker is : https://github.com/tedsmith/quickhash'
       ''
-      'Donations using PayPal at https://paypal.me/quickhashgui'
+      'Donations (Ted Smith) using PayPal at https://paypal.me/quickhashgui'
+      ''
+      'Github Page is : https://github.com/nzchris73/quickhash'
       ''
       'Contributions made by DaReal Shinji (http://www.github.com/darealshinji), especially regarding repository maintenance and Debian packaging are both welcomed and acknowledged, in addition to the Lazarus forum members, who are always so helpful. '
       ''

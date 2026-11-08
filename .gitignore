@@ -49,6 +49,8 @@ ppas.bat
 /project1.xml
 /quickhash.xml
 /QuickHash.xml
+/QuickHash-GUI.xml
+/backup
 
 # Application bundle for Mac OS
 *.app/

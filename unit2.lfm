@@ -4,7 +4,7 @@ object MainForm: TMainForm
   Top = 245
   Width = 1023
   AllowDropFiles = True
-  Caption = 'QuickHash v3.3.4 (Oct 2023) - The easy and convenient way to hash data in Linux, OSX and Windows'
+  Caption = 'QuickHash v3.5.0 (Nov 2026) - The easy and convenient way to hash data in Linux, OSX and Windows'
   ClientHeight = 713
   ClientWidth = 1023
   Menu = MainMenu1

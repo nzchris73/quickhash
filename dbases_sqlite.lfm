@@ -1,27 +1,28 @@
 object frmSQLiteDBases: TfrmSQLiteDBases
   Left = 940
-  Height = 562
+  Height = 702
   Top = 286
-  Width = 460
+  Width = 575
   Caption = 'frmSQLiteDBases'
-  ClientHeight = 562
-  ClientWidth = 460
+  ClientHeight = 702
+  ClientWidth = 575
+  DesignTimePPI = 120
+  Position = poScreenCenter
+  LCLVersion = '5.0.1.0'
   OnClose = FormClose
   OnCreate = FormCreate
-  Position = poScreenCenter
-  LCLVersion = '2.2.4.0'
   object lblConnectionStatus: TLabel
-    Left = 32
+    Left = 40
     Height = 15
-    Top = 32
+    Top = 40
     Width = 81
     Caption = 'Not Connected'
     ParentColor = False
   end
   object DataSource1: TDataSource
     DataSet = sqlFILES
-    Left = 48
-    Top = 144
+    Left = 60
+    Top = 180
   end
   object sqlFILES: TSQLQuery
     PacketRecords = 1
@@ -30,14 +31,14 @@ object frmSQLiteDBases: TfrmSQLiteDBases
     Transaction = SQLTransaction1
     Params = <>
     Macros = <>
-    Left = 48
-    Top = 80
+    Left = 60
+    Top = 100
   end
   object SQLTransaction1: TSQLTransaction
     Active = False
     Database = SQLite3Connection1
-    Left = 48
-    Top = 224
+    Left = 60
+    Top = 280
   end
   object SQLite3Connection1: TSQLite3Connection
     Connected = False
@@ -45,8 +46,8 @@ object frmSQLiteDBases: TfrmSQLiteDBases
     KeepConnection = False
     Transaction = SQLTransaction1
     AlwaysUseBigint = False
-    Left = 48
-    Top = 296
+    Left = 60
+    Top = 370
   end
   object CSVExporter1: TCSVExporter
     ExportFields = <>
@@ -57,13 +58,13 @@ object frmSQLiteDBases: TfrmSQLiteDBases
     FormatSettings.IgnoreOuterWhitespace = False
     FormatSettings.RowDelimiter = #13#10
     FormatSettings.QuoteChar = '"'
-    Left = 48
-    Top = 376
+    Left = 60
+    Top = 470
   end
   object DataSource2: TDataSource
     DataSet = sqlCOPY
-    Left = 160
-    Top = 144
+    Left = 200
+    Top = 180
   end
   object sqlCOPY: TSQLQuery
     FieldDefs = <>
@@ -71,29 +72,29 @@ object frmSQLiteDBases: TfrmSQLiteDBases
     Transaction = SQLTransaction1
     Params = <>
     Macros = <>
-    Left = 160
-    Top = 80
+    Left = 200
+    Top = 100
   end
   object SQLDBLibraryLoaderWindows: TSQLDBLibraryLoader
     Enabled = False
     ConnectionType = 'SQLite3'
     LibraryName = 'sqlite3.dll'
-    Left = 224
-    Top = 224
+    Left = 280
+    Top = 280
   end
   object SQLDBLibraryLoaderOSX: TSQLDBLibraryLoader
     Enabled = False
     ConnectionType = 'SQLite3'
     LibraryName = 'libsqlite3.dylib'
-    Left = 224
-    Top = 296
+    Left = 280
+    Top = 370
   end
   object SQLDBLibraryLoaderLinux: TSQLDBLibraryLoader
     Enabled = False
     ConnectionType = 'SQLite3'
     LibraryName = 'libsqlite3.so'
-    Left = 224
-    Top = 376
+    Left = 280
+    Top = 470
   end
   object sqlCOMPARETWOFOLDERS: TSQLQuery
     FieldDefs = <>
@@ -101,12 +102,12 @@ object frmSQLiteDBases: TfrmSQLiteDBases
     Transaction = SQLTransaction1
     Params = <>
     Macros = <>
-    Left = 296
-    Top = 80
+    Left = 370
+    Top = 100
   end
   object DataSource3: TDataSource
     DataSet = sqlCOMPARETWOFOLDERS
-    Left = 296
-    Top = 144
+    Left = 370
+    Top = 180
   end
 end
