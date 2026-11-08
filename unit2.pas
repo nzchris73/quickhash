@@ -1591,16 +1591,16 @@ begin
       ChosenHashAlg := 'xxHash';
       end;
       6: begin
-      ChosenHashAlg := 'Blake2B';
+      ChosenHashAlg := 'xxHash3';
       end;
       7: begin
-      ChosenHashAlg := 'Blake3';
+      ChosenHashAlg := 'Blake2B';
       end;
       8: begin
-      ChosenHashAlg := 'CRC32';
+      ChosenHashAlg := 'Blake3';
       end;
       9: begin
-      ChosenHashAlg := 'xxHash3';
+      ChosenHashAlg := 'CRC32';
       end;
   end;
   if lblFileAHash.Caption = '...' then
@@ -1637,16 +1637,16 @@ begin
       ChosenHashAlg := 'xxHash';
       end;
       6: begin
-      ChosenHashAlg := 'Blake2B';
+      ChosenHashAlg := 'xxHash3';
       end;
       7: begin
-      ChosenHashAlg := 'Blake3';
+      ChosenHashAlg := 'Blake2B';
       end;
       8: begin
-      ChosenHashAlg := 'CRC32';
+      ChosenHashAlg := 'Blake3';
       end;
       9: begin
-      ChosenHashAlg := 'xxHash3';
+      ChosenHashAlg := 'CRC32';
       end;
   end;
   if lblFileBHash.Caption = '...' then
@@ -2503,7 +2503,7 @@ var
 
       // Added with v3.3.0. If the user has chosen CRC32, ask if the files
       // should just be hashed, or also renamed with the hash at the same time
-      if AlgorithmChoiceRadioBox3.ItemIndex = 8 then
+      if AlgorithmChoiceRadioBox3.ItemIndex = 9 then
       begin
         // If true, rename files. Otherwise just hash. If dialog cancelled, exit loop
         RenameFilesWithCRCHashOrNot := false;
@@ -3720,16 +3720,16 @@ begin
       ChosenHashAlg := 'xxHash';
       end;
       6: begin
-      ChosenHashAlg := 'Blake2b';
+      ChosenHashAlg := 'xxHash3';
       end;
       7: begin
-      ChosenHashAlg := 'Blake3';
+      ChosenHashAlg := 'Blake2b';
       end;
       8: begin
-      ChosenHashAlg := 'CRC32';
+      ChosenHashAlg := 'Blake3';
       end;
       9: begin
-      ChosenHashAlg := 'xxHash3';
+      ChosenHashAlg := 'CRC32';
       end;
   end;
   slCompareTwoFiles := TStringList.Create;
@@ -3965,21 +3965,21 @@ begin
            {$endif}
            end;
         6: begin
+             result := THashFactory.THash64.CreateXXHash3().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+           end;
+        7: begin
              result := THashFactory.TCrypto.CreateBlake2B_256.ComputeString(strToBeHashed, TEncoding.UTF8).ToString();  // Blake2B, added to v3.1.0
            end;
-        7: begin                                                                                                        // Blake3, new as of v3.2.0
+        8: begin                                                                                                        // Blake3, new as of v3.2.0
              HashInstanceBlake3 := THashFactory.TCrypto.CreateBlake3_256(nil);
              HashInstanceBlake3.Initialize();
              HashInstanceBlake3.TransformString(strToBeHashed, TEncoding.UTF8);
              HashInstanceResultBlake3 := HashInstanceBlake3.TransformFinal();
              result := HashInstanceResultBlake3.ToString()
            end;
-        8: begin
+        9: begin
              crcstandard := TCRCStandard.CRC32;
              result := THashFactory.TChecksum.TCRC.CreateCRC(crcstandard).ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
-           end;
-        9: begin
-             result := THashFactory.THash64.CreateXXHash3().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
            end;
       end;  // end of case statement
     end; // End of string length check
@@ -4288,7 +4288,7 @@ begin
         {$endif}
         end;  // End of xxHash
 
-       6: begin
+       7: begin
         // Blake2B
         HashInstanceBlake2B := THashFactory.TCrypto.CreateBlake2B_256();
         HashInstanceBlake2B.Initialize();
@@ -4318,7 +4318,7 @@ begin
         result := HashInstanceResultBlake2B.ToString()
         end; // End of Blake2B
 
-       7: begin
+       8: begin
           // Blake3
           HashInstanceBlake3 := THashFactory.TCrypto.CreateBlake3_256(nil);
           HashInstanceBlake3.Initialize();
@@ -4348,7 +4348,7 @@ begin
           result := HashInstanceResultBlake3.ToString()
           end; // End of Blake3
 
-       8: begin
+       9: begin
           crcstandard := TCRCStandard.CRC32;
           HashInstanceCRC32 := THashFactory.TChecksum.TCRC.CreateCRC(crcstandard);
           HashInstanceCRC32.Initialize();
@@ -4378,7 +4378,7 @@ begin
           result := HashInstanceResultCRC32.ToString();
           end; // End of CRC32
 
-       9: begin
+       6: begin
           HashInstanceXXHash3 := THashFactory.THash64.CreateXXHash3();
           HashInstanceXXHash3.Initialize();
           repeat
@@ -4801,19 +4801,19 @@ begin
       end;
 
       6: begin
-      ShowMessage('Blake2B is not typically used in E01 images');
+      ShowMessage('xxHash3 is not typically used in E01 images');
       end;
 
       7: begin
-      ShowMessage('Blake3 is not typically used in E01 images');
+      ShowMessage('Blake2B is not typically used in E01 images');
       end;
 
       8: begin
-      ShowMessage('CRC32 is certainly not typically used in E01 images');
+      ShowMessage('Blake3 is not typically used in E01 images');
       end;
 
       9: begin
-      ShowMessage('xxHash3 is not typically used in E01 images');
+      ShowMessage('CRC32 is certainly not typically used in E01 images');
       end;
   end; // Case radio group end
 end;

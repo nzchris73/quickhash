@@ -1856,10 +1856,16 @@ begin
       ChosenHashAlg := 'xxHash';
       end;
       6: begin
+      ChosenHashAlg := 'xxHash3';
+      end;
+      7: begin
       ChosenHashAlg := 'Blake2B';
       end;
+      8: begin
+      ChosenHashAlg := 'Blake3';
+      end;
       9: begin
-      ChosenHashAlg := 'xxHash3';
+      ChosenHashAlg := 'CRC32';
       end;
   end;
 

@@ -260,10 +260,10 @@ object MainForm: TMainForm
           'SHA256'
           'SHA512'
           'xxHash'
+          'xxHash3'
           'Blake2B'
           'Blake3'
           'CRC32'
-          'xxHash3'
         )
         OnClick = AlgorithmChoiceRadioBox1Click
         OnSelectionChanged = HashText
@@ -512,10 +512,10 @@ object MainForm: TMainForm
           'SHA256'
           'SHA512'
           'xxHash'
+          'xxHash3'
           'Blake2B'
           'Blake3'
           'CRC32'
-          'xxHash3'
         )
         OnClick = AlgorithmChoiceRadioBox2Click
         OnSelectionChanged = AlgorithmChoiceRadioBox2SelectionChanged
@@ -887,10 +887,10 @@ object MainForm: TMainForm
           'SHA256'
           'SHA512'
           'xxHash'
+          'xxHash3'
           'Blake2B'
           'Blake3'
           'CRC32'
-          'xxHash3'
         )
         OnClick = AlgorithmChoiceRadioBox3Click
         ParentFont = False
@@ -1328,10 +1328,10 @@ object MainForm: TMainForm
           'SHA256'
           'SHA512'
           'xxHash'
+          'xxHash3'
           'Blake2B'
           'Blake3'
           'CRC32'
-          'xxHash3'
         )
         OnClick = AlgorithmChoiceRadioBox4Click
         ParentFont = False
@@ -1378,10 +1378,10 @@ object MainForm: TMainForm
           'SHA256'
           'SHA512'
           'xxHash'
+          'xxHash3'
           'Blake2B'
           'Blake3'
           'CRC32'
-          'xxHash3'
         )
         OnClick = AlgorithmChoiceRadioBox5Click
         OnSelectionChanged = AlgorithmChoiceRadioBox5SelectionChanged
@@ -1610,10 +1610,10 @@ object MainForm: TMainForm
           'SHA256'
           'SHA512'
           'xxHash'
+          'xxHash3'
           'Blake2B'
           'Blake3'
           'CRC32'
-          'xxHash3'
         )
         OnClick = AlgorithmChoiceRadioBox6Click
         ParentFont = False
@@ -1958,10 +1958,10 @@ object MainForm: TMainForm
           'SHA256'
           'SHA512'
           'xxHash'
+          'xxHash3'
           'Blake2B'
           'Blake3'
           'CRC32'
-          'xxHash3'
         )
         OnClick = AlgorithmChoiceRadioBox7Click
         ParentFont = False
