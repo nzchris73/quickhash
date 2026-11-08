@@ -49,6 +49,7 @@ uses
   HlpSipHash,
   HlpSipHash128,
   HlpXXHash64,
+  HlpXXHash3,
   // Hash128 Units //
   HlpMurmurHash3_x86_128,
   HlpMurmurHash3_x64_128,
@@ -237,6 +238,8 @@ type
       class function CreateSipHash2_4(): IHashWithKey; static;
 
       class function CreateXXHash64(): IHashWithKey; static;
+
+      class function CreateXXHash3(): IHashWithKey; static;
 
     end;
 
@@ -834,6 +837,11 @@ end;
 class function THashFactory.THash64.CreateXXHash64: IHashWithKey;
 begin
   Result := TXXHash64.Create();
+end;
+
+class function THashFactory.THash64.CreateXXHash3: IHashWithKey;
+begin
+  Result := TXXHash3.Create();
 end;
 
 { THashFactory.THash128 }

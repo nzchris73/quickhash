@@ -1506,7 +1506,7 @@ begin
        64	SHA-3
        64	SHA-256
        128	SHA512
-       16	xxHash
+       16	xxHash / xxHash3
        64	Blake2B
        64	Blake3
        8        CRC32
@@ -1545,7 +1545,7 @@ begin
       64	SHA-3
       64	SHA-256
       128	SHA512
-      16	xxHash
+      16	xxHash / xxHash3
       64	Blake2B
       64	Blake3
       8	        CRC32
@@ -1599,6 +1599,9 @@ begin
       8: begin
       ChosenHashAlg := 'CRC32';
       end;
+      9: begin
+      ChosenHashAlg := 'xxHash3';
+      end;
   end;
   if lblFileAHash.Caption = '...' then
     exit
@@ -1641,6 +1644,9 @@ begin
       end;
       8: begin
       ChosenHashAlg := 'CRC32';
+      end;
+      9: begin
+      ChosenHashAlg := 'xxHash3';
       end;
   end;
   if lblFileBHash.Caption = '...' then
@@ -1935,11 +1941,9 @@ end;
 
 // These radio click events are to ensure the same hash algorithm is chosen
 // for all the tabs, if the user changes it from the default. New to v.2.8.2.
-// Note that as of v3.2.0, there are 7 RadioBoxes. Each box has 8 options.
+// Note that as of v3.2.0, there are 7 RadioBoxes. Each box shares the same options.
 // So new click procedures are not needed for every new algorithm added. Only when
-// new Radio Boxes are added. Example : AlgorithmChoiceRadioBox1 has 8 options.
-// But as long Radio Box's 2, 3, 4, 5, 6 are 'refreshed' they will show the selected
-// radio, which might be 1 (MD5) or 8 (Blake3).
+// new Radio Boxes are added. All seven groups share the same options.
 
 procedure TMainForm.AlgorithmChoiceRadioBox1Click(Sender: TObject);      // Ensure all radio buttons equal MD5
 begin
@@ -3724,6 +3728,9 @@ begin
       8: begin
       ChosenHashAlg := 'CRC32';
       end;
+      9: begin
+      ChosenHashAlg := 'xxHash3';
+      end;
   end;
   slCompareTwoFiles := TStringList.Create;
   slCompareTwoFiles.Add('File A: ' + edtFileAName.Caption + ', ' + ChosenHashAlg + ' Hash: ' + lblFileAHash.Caption);
@@ -3971,6 +3978,9 @@ begin
              crcstandard := TCRCStandard.CRC32;
              result := THashFactory.TChecksum.TCRC.CreateCRC(crcstandard).ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
            end;
+        9: begin
+             result := THashFactory.THash64.CreateXXHash3().ComputeString(strToBeHashed, TEncoding.UTF8).ToString();
+           end;
       end;  // end of case statement
     end; // End of string length check
 end;
@@ -3998,7 +4008,8 @@ var
   HashInstanceResultSHA512,
   HashInstanceResultBlake2B,
   HashInstanceResultBlake3,
-  HashInstanceResultCRC32 : IHashResult;
+  HashInstanceResultCRC32,
+  HashInstanceResultXXHash3 : IHashResult;
 
   // HashLib4Pascal types for xxHash. xxHash64 is crazy fast on 64, but if run on a 32-bit
   // system, performance is hindered considerably. So for this algorithm, CPU dependant
@@ -4010,6 +4021,7 @@ var
   HashInstancexxHash32         : IHash;
   HashInstanceResultxxHash32   : IHashResult;
 {$endif}
+  HashInstanceXXHash3 : IHash;
   crcstandard : TCRCStandard;
   Buffer: array [0 .. BufSize - 1] of Byte;
   i : Integer;
@@ -4365,6 +4377,34 @@ begin
           HashInstanceResultCRC32 := HashInstanceCRC32.TransformFinal();
           result := HashInstanceResultCRC32.ToString();
           end; // End of CRC32
+
+       9: begin
+          HashInstanceXXHash3 := THashFactory.THash64.CreateXXHash3();
+          HashInstanceXXHash3.Initialize();
+          repeat
+            i := fsFileToBeHashed.Read(Buffer, BufSize);
+            if i <= 0 then
+              break
+            else
+              begin
+                HashInstanceXXHash3.TransformUntyped(Buffer, i);
+                if PageControl1.ActivePage = TabSheet2 then
+                  begin
+                    inc(TotalBytesRead_B, i);
+                    inc(LoopCounter, 1);
+                    if LoopCounter = 40 then
+                      begin
+                        pbFile.Position := ((TotalBytesRead_B * 100) DIV IntFileSize);
+                        lblPercentageProgressFileTab.Caption := IntToStr(pbFile.Position) + '%';
+                        LoopCounter := 0;
+                        Application.ProcessMessages;
+                      end;
+                  end;
+              end;
+          until false;
+          HashInstanceResultXXHash3 := HashInstanceXXHash3.TransformFinal();
+          result := HashInstanceResultXXHash3.ToString();
+          end; // End of xxHash3
     end; // end of case statement
   end // end of FileSize greater than zero byte check
   else
@@ -4770,6 +4810,10 @@ begin
 
       8: begin
       ShowMessage('CRC32 is certainly not typically used in E01 images');
+      end;
+
+      9: begin
+      ShowMessage('xxHash3 is not typically used in E01 images');
       end;
   end; // Case radio group end
 end;

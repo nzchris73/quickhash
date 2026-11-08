@@ -1858,6 +1858,9 @@ begin
       6: begin
       ChosenHashAlg := 'Blake2B';
       end;
+      9: begin
+      ChosenHashAlg := 'xxHash3';
+      end;
   end;
 
   Header := ChosenHashAlg;

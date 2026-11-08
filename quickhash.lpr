@@ -42,6 +42,7 @@
 
     HashLib4Pascal and xxHash64 libraries are both licensed under the MIT License
     https://opensource.org/licenses/MIT
+    The xxHash3 implementation is provided by HashLib4Pascal.
 
     HashLib4Pascal : https://github.com/Xor-el/HashLib4Pascal and developed by
                      Github user Xor-el (Ugochukwu Stanley). Use of the

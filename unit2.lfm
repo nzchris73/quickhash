@@ -235,7 +235,7 @@ object MainForm: TMainForm
       end
       object AlgorithmChoiceRadioBox1: TRadioGroup
         Left = 16
-        Height = 206
+        Height = 228
         Hint = 'Easily recompute different hashes'#13#10'by choosing a different hash algorithm.'#13#10'Note SHA-3 and Blake2b are 256 bit mode. '
         Top = 10
         Width = 96
@@ -249,7 +249,7 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 184
+        ClientHeight = 206
         ClientWidth = 92
         Font.Height = -13
         ItemIndex = 1
@@ -263,6 +263,7 @@ object MainForm: TMainForm
           'Blake2B'
           'Blake3'
           'CRC32'
+          'xxHash3'
         )
         OnClick = AlgorithmChoiceRadioBox1Click
         OnSelectionChanged = HashText
@@ -487,7 +488,7 @@ object MainForm: TMainForm
       end
       object AlgorithmChoiceRadioBox2: TRadioGroup
         Left = 16
-        Height = 206
+        Height = 228
         Top = 10
         Width = 96
         AutoFill = True
@@ -500,7 +501,7 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 184
+        ClientHeight = 206
         ClientWidth = 92
         Font.Height = -13
         ItemIndex = 1
@@ -514,6 +515,7 @@ object MainForm: TMainForm
           'Blake2B'
           'Blake3'
           'CRC32'
+          'xxHash3'
         )
         OnClick = AlgorithmChoiceRadioBox2Click
         OnSelectionChanged = AlgorithmChoiceRadioBox2SelectionChanged
@@ -861,7 +863,7 @@ object MainForm: TMainForm
       end
       object AlgorithmChoiceRadioBox3: TRadioGroup
         Left = 16
-        Height = 206
+        Height = 228
         Top = 10
         Width = 96
         AutoFill = True
@@ -874,7 +876,7 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 184
+        ClientHeight = 206
         ClientWidth = 92
         Font.Height = -13
         ItemIndex = 1
@@ -888,6 +890,7 @@ object MainForm: TMainForm
           'Blake2B'
           'Blake3'
           'CRC32'
+          'xxHash3'
         )
         OnClick = AlgorithmChoiceRadioBox3Click
         ParentFont = False
@@ -1301,7 +1304,7 @@ object MainForm: TMainForm
       end
       object AlgorithmChoiceRadioBox4: TRadioGroup
         Left = 16
-        Height = 206
+        Height = 228
         Top = 10
         Width = 96
         AutoFill = True
@@ -1314,7 +1317,7 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 184
+        ClientHeight = 206
         ClientWidth = 92
         Font.Height = -13
         ItemIndex = 1
@@ -1328,6 +1331,7 @@ object MainForm: TMainForm
           'Blake2B'
           'Blake3'
           'CRC32'
+          'xxHash3'
         )
         OnClick = AlgorithmChoiceRadioBox4Click
         ParentFont = False
@@ -1350,7 +1354,7 @@ object MainForm: TMainForm
       ClientWidth = 983
       object AlgorithmChoiceRadioBox5: TRadioGroup
         Left = 16
-        Height = 206
+        Height = 228
         Top = 10
         Width = 96
         AutoFill = True
@@ -1363,7 +1367,7 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 184
+        ClientHeight = 206
         ClientWidth = 92
         Font.Height = -13
         ItemIndex = 1
@@ -1377,6 +1381,7 @@ object MainForm: TMainForm
           'Blake2B'
           'Blake3'
           'CRC32'
+          'xxHash3'
         )
         OnClick = AlgorithmChoiceRadioBox5Click
         OnSelectionChanged = AlgorithmChoiceRadioBox5SelectionChanged
@@ -1581,7 +1586,7 @@ object MainForm: TMainForm
       end
       object AlgorithmChoiceRadioBox6: TRadioGroup
         Left = 16
-        Height = 206
+        Height = 228
         Top = 10
         Width = 96
         AutoFill = True
@@ -1594,7 +1599,7 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 184
+        ClientHeight = 206
         ClientWidth = 92
         Font.Height = -13
         ItemIndex = 1
@@ -1608,6 +1613,7 @@ object MainForm: TMainForm
           'Blake2B'
           'Blake3'
           'CRC32'
+          'xxHash3'
         )
         OnClick = AlgorithmChoiceRadioBox6Click
         ParentFont = False
@@ -1928,7 +1934,7 @@ object MainForm: TMainForm
       ClientWidth = 983
       object AlgorithmChoiceRadioBox7: TRadioGroup
         Left = 16
-        Height = 206
+        Height = 228
         Top = 10
         Width = 96
         AutoFill = True
@@ -1941,7 +1947,7 @@ object MainForm: TMainForm
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 184
+        ClientHeight = 206
         ClientWidth = 92
         Font.Height = -13
         ItemIndex = 1
@@ -1955,6 +1961,7 @@ object MainForm: TMainForm
           'Blake2B'
           'Blake3'
           'CRC32'
+          'xxHash3'
         )
         OnClick = AlgorithmChoiceRadioBox7Click
         ParentFont = False

@@ -811,15 +811,19 @@ begin
                           begin
                             result := 7;
                           end
-                            else if comboHashChoice.Text = 'Blake3' then
+                            else if comboHashChoice.Text = 'xxHash3' then
                             begin
                               result := 8;
                             end
+                              else if comboHashChoice.Text = 'Blake3' then
+                            begin
+                              result := 9;
+                            end
                               else if comboHashChoice.Text = 'CRC32' then
                               begin
-                                result := 9;
+                                result := 10;
                               end
-    else result := 10;
+    else result := 11;
 end;
 
 // Get the technical disk data for a specifically selected disk. Returns 1 on success
@@ -1064,7 +1068,7 @@ const
 
     // Determine what hash algorithm to use.
     // MD5 = 1, SHA-1 = 2, MD5 & SHA-1 = 3, SHA256 = 4,
-    // SHA512 = 5, SHA-1 & SHA256 = 6, xxHash = 7, Blake3 = 8, CRC32 = 9. Use non = 10. -1 is false
+    // xxHash = 7, xxHash3 = 8, Blake3 = 9, CRC32 = 10, no hash = 11.
     HashChoice := frmDiskHashingModule.InitialiseHashChoice(nil);
     if HashChoice = -1 then abort;
 
@@ -1216,10 +1220,10 @@ var
 
   // Hash Instances
   HashInstanceMD5, HashInstanceSHA1, HashInstanceSHA256, HashInstanceSHA512, HashInstanceBlake3,
-    HashInstanceCRC32 : IHash;
+    HashInstanceCRC32, HashInstanceXXHash3 : IHash;
   // Hash Results
   HashInstanceResultMD5, HashInstanceResultSHA1, HashInstanceResultSHA256, HashInstanceResultSHA512,
-    HashInstanceResultBlake3, HashInstanceResultCRC32 : IHashResult;
+    HashInstanceResultBlake3, HashInstanceResultCRC32, HashInstanceResultXXHash3 : IHashResult;
   // CRC32
   crcstandard : TCRCStandard;
 
@@ -1291,18 +1295,23 @@ begin
                           HashInstancexxHash32.Initialize();
                          {$endif}
                         end
-                          else if HashChoice = 8 then // Blake3
+                          else if HashChoice = 8 then // xxHash3
+                          begin
+                            HashInstanceXXHash3 := THashFactory.THash64.CreateXXHash3();
+                            HashInstanceXXHash3.Initialize();
+                          end
+                            else if HashChoice = 9 then // Blake3
                           begin
                             HashInstanceBlake3 := THashFactory.TCrypto.CreateBlake3_256(nil);
                             HashInstanceBlake3.Initialize();
                           end
-                            else if HashChoice = 9 then // CRC32
+                            else if HashChoice = 10 then // CRC32
                             begin
                               crcstandard := TCRCStandard.CRC32;
                               HashInstanceCRC32 := THashFactory.TChecksum.TCRC.CreateCRC(crcstandard);
                               HashInstanceCRC32.Initialize();
                             end
-                              else if HashChoice = 10 then
+                              else if HashChoice = 11 then
                                 begin
                                  // No hashing initiliased
                                 end;
@@ -1338,7 +1347,7 @@ begin
 
         // Hash the bytes read and\or written using the algorithm required
         // If the user selected no hashing, break the loop immediately; faster
-        if HashChoice = 10 then
+        if HashChoice = 11 then
           begin
            // No hashing initiliased
           end
@@ -1378,9 +1387,13 @@ begin
                                   end
                                     else if HashChoice = 8 then
                                     begin
-                                     HashInstanceBlake3.TransformUntyped(Buffer, BytesRead);
+                                      HashInstanceXXHash3.TransformUntyped(Buffer, BytesRead);
                                     end
                                       else if HashChoice = 9 then
+                                    begin
+                                     HashInstanceBlake3.TransformUntyped(Buffer, BytesRead);
+                                    end
+                                      else if HashChoice = 10 then
                                       begin
                                        HashInstanceCRC32.TransformUntyped(Buffer, BytesRead);
                                       end;
@@ -1469,6 +1482,12 @@ begin
                               end
                                 else if HashChoice = 8 then
                                 begin
+                                HashInstanceResultXXHash3 := HashInstanceXXHash3.TransformFinal();
+                                frmDiskHashingModule.ledtComputedHash.Text := Uppercase(HashInstanceResultXXHash3.ToString());
+                                frmDiskHashingModule.ledtComputedHash.Enabled := true;
+                                end
+                                else if HashChoice = 9 then
+                                begin
                                   // Blake3 hash
                                   HashInstanceResultBlake3 := HashInstanceBlake3.TransformFinal();
                                   begin
@@ -1476,7 +1495,7 @@ begin
                                     frmDiskHashingModule.ledtComputedHash.Enabled := true;
                                   end;
                                 end
-                                  else if HashChoice = 9 then
+                                  else if HashChoice = 10 then
                                     begin
                                       // CRC32 hash
                                       HashInstanceResultCRC32 := HashInstanceCRC32.TransformFinal();
@@ -1485,7 +1504,7 @@ begin
                                         frmDiskHashingModule.ledtComputedHash.Enabled := true;
                                       end;
                                     end
-      else if HashChoice = 10 then
+      else if HashChoice = 11 then
         begin
          frmDiskHashingModule.ledtComputedHash.Text    := Uppercase('No hash computed');
          frmProgress.lblStatus.Caption      := 'No verification conducted';

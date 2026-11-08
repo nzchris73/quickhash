@@ -1,6 +1,10 @@
 ﻿Version History
 ===============
 
+Unreleased
+----------
+Added xxHash3 (64-bit) as an algorithm option for text, file, and disk hashing.
+
 v3.3.4 - Oct 2023
 
 Removed default XML file name specification that is used for storing some last used settings for greater cross platform suitability, so it just uses a system default instead
@@ -914,4 +918,3 @@ Hashing of a single file (or disk if ran in Linux using sudo or root permissions
 Hashing of an entire directory - its children and al sub-directories, including a percentage progress indicator. 
 
 Copy and Paste to Clipboard
-
