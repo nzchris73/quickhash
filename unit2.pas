@@ -103,7 +103,7 @@ uses
     Strutils,
   {$ENDIF}
   Classes, SysUtils, FileUtil, LResources, Forms, Controls,
-  Graphics, Dialogs, StdCtrls, Menus, ComCtrls, LazUTF8, LazUTF8Classes,
+  Graphics, Dialogs, StdCtrls, Menus, ComCtrls, LazUTF8,
   LazFileUtils, Grids, ExtCtrls, sysconst, lclintf, ShellCtrls,
   XMLPropStorage,  diskmodule,
   clipbrd, DBGrids, DbCtrls, DateTimePicker, frmAboutUnit, base64,
@@ -1244,7 +1244,7 @@ end;
 // https://support.google.com/adwords/answer/6276125?hl=en-GB
 procedure TMainForm.btnLBLClick(Sender: TObject);
 var
-  slLBL : TStringListUTF8;
+  slLBL : TStringList;
   i     : Longword;
   strToHash : string;
 begin
@@ -1272,7 +1272,7 @@ begin
           ChosenDelimiter := #32;
         end;
 
-    slLBL := TStringListUTF8.Create;
+    slLBL := TStringList.Create;
     if not cbToggleInputDataToOutputFile.Checked then
       begin
       for i := 0 to memoHashText.Lines.Count -1 do
@@ -1311,7 +1311,7 @@ end;
 // Similar to the procedure for hashing the memo line-by-line in "Text" tab
 procedure TMainForm.btnFLBLClick(Sender: TObject);
 var
-  slFLBLInput, slFLBLOutput : TStringListUTF8; // FLBL = File, Line by Line
+  slFLBLInput, slFLBLOutput : TStringList; // FLBL = File, Line by Line
   i : Longword;
 begin
   i := 0;
@@ -1335,8 +1335,8 @@ begin
             ChosenDelimiter := #32;
           end;
 
-      slFLBLInput := TStringListUTF8.Create;
-      slFLBLOutput:= TStringListUTF8.Create;
+      slFLBLInput := TStringList.Create;
+      slFLBLOutput:= TStringList.Create;
       slFLBLInput.Sorted:= false;
       slFLBLOutput.Sorted:= false;
 
@@ -5027,7 +5027,7 @@ begin
   {$ENDIF}
   SizeOfCurrentFile       := -1;
 
-  SLCopyErrors := TStringListUTF8.Create;
+  SLCopyErrors := TStringList.Create;
 
   // Ensures the selected source directory is set as the directory to be searched
   // and then finds all the files and directories within, storing as a StringList.
@@ -5076,13 +5076,13 @@ begin
     if not chkNoRecursiveCopy.Checked then        // and does want recursive
      begin
        try
-       FilesFoundToCopy := TStringListUTF8.Create;
+       FilesFoundToCopy := TStringList.Create;
        FilesFoundToCopy.Sorted := true;
        for i := 0 to slMultipleDirNames.Count -1 do
          begin
            SourceDirName := slMultipleDirNames.Strings[i];
            try
-             slTemp        := TStringListUTF8.Create;
+             slTemp        := TStringList.Create;
              slTemp.Sorted := true;
              slTemp        := FindAllFilesEx(LongPathOverride+SourceDirName, FileMask, True, True);
              for j := 0 to slTemp.Count -1 do
@@ -5101,13 +5101,13 @@ begin
       else
       begin
         try
-        FilesFoundToCopy := TStringListUTF8.Create;
+        FilesFoundToCopy := TStringList.Create;
         FilesFoundToCopy.Sorted := true;
         for i := 0 to slMultipleDirNames.Count -1 do
          begin
            SourceDirName    := slMultipleDirNames.Strings[i];
            try
-             slTemp           := TStringListUTF8.Create;
+             slTemp           := TStringList.Create;
              slTemp.Sorted    := true;
              slTemp           := FindAllFilesEx(LongPathOverride+SourceDirName, FileMask, False, True);
              for j := 0 to slTemp.Count -1 do

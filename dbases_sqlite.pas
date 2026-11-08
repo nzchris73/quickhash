@@ -15,7 +15,7 @@ uses
 {$endif}
   Classes, SysUtils, db, sqldb, sqldblib, fpcsvexport, sqlite3conn, FileUtil,
   LResources, Forms, Controls, Graphics, Dialogs, StdCtrls, ExtCtrls, DBGrids,
-  sqlite3dyn, clipbrd, DbCtrls, LazUTF8, LazUTF8Classes;
+  sqlite3dyn, clipbrd, DbCtrls, LazUTF8;
 
 type
 
@@ -643,7 +643,7 @@ var
   KnownHashCell  : string = Default(string);
   NoOfRowsInGrid : integer = Default(integer);
   sl             : TStringList;
-  fs             : TFileStreamUTF8;
+  fs             : TFileStream;
   ExportSQLQuery : TSQLQuery;
 const
   strHTMLHeader      = '<HTML>'  ;
@@ -728,9 +728,9 @@ begin
         try
           if not FileExists(filename) then
             begin
-              fs := TFileStreamUTF8.Create(Filename, fmCreate);
+              fs := TFileStream.Create(Filename, fmCreate);
             end
-          else fs := TFileStreamUTF8.Create(Filename, fmOpenReadWrite);
+          else fs := TFileStream.Create(Filename, fmOpenReadWrite);
 
           MainForm.StatusBar2.Caption:= ' Saving grid to ' + Filename + '...please wait';
           strTitle := '<p>HTML Output generated ' + FormatDateTime('YYYY/MM/DD HH:MM:SS', Now) + ' using ' + MainForm.Caption + '</p>';
@@ -958,7 +958,7 @@ begin
 
   try
     // Create a filestream for the output CSV.
-    CSVFileToWrite := TFileStreamUTF8.Create(Filename, fmCreate);
+    CSVFileToWrite := TFileStream.Create(Filename, fmCreate);
     if CSVFileToWrite.Handle > 0 then
       begin
         linetowrite := ('No' + ChosenDelimiter +
@@ -1057,7 +1057,7 @@ begin
 
   try
   // Create a filestream for the output CSV.
-  CSVFileToWrite := TFileStreamUTF8.Create(Filename, fmCreate);
+  CSVFileToWrite := TFileStream.Create(Filename, fmCreate);
   // Add header
   linetowrite := 'No'                       + ChosenDelimiter +
                 'Source Filename'          + ChosenDelimiter +
@@ -1136,7 +1136,7 @@ begin
   linetowrite := '';
   ChosenDelimiter := MainForm.ChosenDelimiter;
   try
-    CSVFileToWrite := TFileStreamUTF8.Create(Filename, fmCreate);
+    CSVFileToWrite := TFileStream.Create(Filename, fmCreate);
     if CSVFileToWrite.Handle > 0 then
     begin
       // Add headers and adjust column headings depending on which filter is active
@@ -1246,14 +1246,14 @@ end;
 // and asks to list duplicates. As the column layout is different, this is its own clipboard event
 procedure TfrmSQLiteDBases.Copy_C2F_DuplicatesList(DBGrid : TDBGrid);
 var
-  CSVClipboardList : TStringListUTF8;
+  CSVClipboardList : TStringList;
   RowCount : integer = Default(integer);
 begin
   Mainform.StatusBar2.SimpleText := 'Counting rows and writing to clipboard if possible...please wait';
   Application.ProcessMessages;
   ChosenDelimiter := MainForm.ChosenDelimiter;
     try
-      CSVClipboardList := TStringListUTF8.Create;
+      CSVClipboardList := TStringList.Create;
       // Add the grid headers
       CSVClipboardList.Add('No'      + ChosenDelimiter + 'Filepath'  + ChosenDelimiter +
                            'FileName'+ ChosenDelimiter + 'HashValue');
@@ -1284,7 +1284,7 @@ end;
 // Used to clipboard the entire FILES display grid
 procedure TfrmSQLiteDBases.DatasetToClipBoardFILES(DBGrid : TDBGrid);
 var
-  CSVClipboardList : TStringListUTF8;
+  CSVClipboardList : TStringList;
   RowCount : integer = Default(integer);
   KnownHashFlagIsSet : boolean = Default(boolean);
 begin
@@ -1328,7 +1328,7 @@ begin
   if RowCount < 20000 then
   begin
     try
-      CSVClipboardList := TStringListUTF8.Create;
+      CSVClipboardList := TStringList.Create;
       CSVClipboardList.Add('Filename'  + ChosenDelimiter + 'FilePath' + ChosenDelimiter +
                         'HashValue' + ChosenDelimiter + 'FileSize' + ChosenDelimiter +
                         'KnownHashFlag');
@@ -1380,7 +1380,7 @@ end;
 // Copies the DBGrid content to clipboard
 procedure TfrmSQLiteDBases.DatasetToClipBoard(DBGrid : TDBGrid);
 var
-  CSVClipboardList : TStringListUTF8;
+  CSVClipboardList : TStringList;
   RowCount : integer = Default(integer);
   tblName : string = Default(string);
 begin
@@ -1432,7 +1432,7 @@ begin
   if RowCount < 20000 then
   begin
     try
-      CSVClipboardList := TStringListUTF8.Create;
+      CSVClipboardList := TStringList.Create;
       // Add the grid headers. If "Show Duplicates" was just active, adjust header layout
       If FC2Fquery = false  then
       begin
@@ -2252,7 +2252,7 @@ end;
 // Used by the COPY display grid to clipboard data from the grid
 procedure TfrmSQLiteDBases.DatasetToClipBoardCOPYTAB(DBGrid : TDBGrid);
 var
-  CSVClipboardList : TStringListUTF8;
+  CSVClipboardList : TStringList;
   RowCount : integer = Default(integer);
 begin
   Mainform.StatusBar2.SimpleText := 'Counting rows and writing to clipboard if possible...please wait';
@@ -2262,7 +2262,7 @@ begin
   if RowCount < 20000 then
   begin
     try
-      CSVClipboardList := TStringListUTF8.Create;
+      CSVClipboardList := TStringList.Create;
       // Add the grid headers
       CSVClipboardList.Add('No'                   + ChosenDelimiter +
                            'Source Filename'      + ChosenDelimiter +
@@ -2314,7 +2314,7 @@ var
   DestinationFileHash  : string = Default(string);
   NoOfRowsInGrid       : integer = Default(integer);
   sl                   : TStringList;
-  fs                   : TFileStreamUTF8;
+  fs                   : TFileStream;
   ExportSQLQuery       : TSQLQuery;
 
   const
@@ -2392,9 +2392,9 @@ begin
     try
     if not FileExists(filename) then
       begin
-        fs := TFileStreamUTF8.Create(Filename, fmCreate);
+        fs := TFileStream.Create(Filename, fmCreate);
       end
-    else fs := TFileStreamUTF8.Create(Filename, fmOpenReadWrite);
+    else fs := TFileStream.Create(Filename, fmOpenReadWrite);
 
     // Create HTML Header Data
     MainForm.StatusBar2.Caption:= ' Saving grid to ' + Filename + '...please wait';
@@ -2510,7 +2510,7 @@ var
   FileHashB         : string = Default(string);
   NoOfRowsInGrid    : integer = Default(integer);
   sl                : TStringList;
-  fs                : TFileStreamUTF8;
+  fs                : TFileStream;
   ExportSQLQuery    : TSQLQuery;
 const
   strHTMLHeader     = '<HTML>'  ;
@@ -2580,9 +2580,9 @@ begin
     try
     if not FileExists(filename) then
       begin
-        fs := TFileStreamUTF8.Create(Filename, fmCreate);
+        fs := TFileStream.Create(Filename, fmCreate);
       end
-    else fs := TFileStreamUTF8.Create(Filename, fmOpenReadWrite);
+    else fs := TFileStream.Create(Filename, fmOpenReadWrite);
 
     MainForm.StatusBar2.Caption:= ' Saving grid to ' + Filename + '...please wait';
     strTitle := '<p>HTML Output generated ' + FormatDateTime('YYYY/MM/DD HH:MM:SS', Now) + ' using ' + MainForm.Caption + '</p>';
