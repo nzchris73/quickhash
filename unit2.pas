@@ -129,6 +129,7 @@ uses
   uEnvironmentChecker,
   // New to v3.3.0 as experimental new feature.
   uLibEWF,
+  uFileHashWorkers,
 
   // Remaining Uses clauses for specific OS's
   {$IFDEF Windows}
@@ -565,6 +566,11 @@ type
     function CustomisedForceDirectoriesUTF8(const Dir: string; PreserveTime: Boolean): Boolean;
 
   private
+   FFileHashPool: TFileHashWorkerPool;
+   FFileHashLongPathOverride: string;
+   FFileHashScanActive: Boolean;
+   procedure DrainFileHashResults(TargetOutstanding: Integer);
+   procedure ProcessFileHashResult(AResult: TFileHashResult);
    // Global handle exception controller, courtesy of GetMem from the forums
    // http://forum.lazarus.freepascal.org/index.php/topic,39842.0.html
    procedure HandleExceptions(Sender: TObject; E: Exception);
@@ -2446,8 +2452,21 @@ var
   FS                           : TFileSearcher;
   TotalFilesToExamine          : TStringList;
   start, stop, elapsed         : TDateTime;
+  WorkerCount                  : Integer;
+  ScanCompleted                : Boolean;
+  AlgorithmChoiceWasEnabled    : Boolean;
+  HashListOptionWasEnabled     : Boolean;
 
   begin
+  if FFileHashScanActive then
+    Exit;
+  FFileHashScanActive := True;
+  AlgorithmChoiceWasEnabled := AlgorithmChoiceRadioBox3.Enabled;
+  HashListOptionWasEnabled := cbLoadHashList.Enabled;
+  try
+  {$IFDEF Windows}
+  LongPathOverride := '';
+  {$ENDIF}
   PageControl1.ActivePage       := Tabsheet3;  // Ensure FileS tab activated if triggered via menu
   FileCounter                   := 1;
   TotalBytesRead                := 0;
@@ -2500,6 +2519,7 @@ var
         Delete(DirToHash, 1, 2); // Delete the \\ from the UNC DirToHash path which always start \\path (otherwise it becomes '\\?\UNC\\\')
       end;
       {$endif}
+      FFileHashLongPathOverride := LongPathOverride;
 
       // Added with v3.3.0. If the user has chosen CRC32, ask if the files
       // should just be hashed, or also renamed with the hash at the same time
@@ -2574,7 +2594,18 @@ var
 
     // Create and assign a File Searcher instance and dictate its behaviour.
     // Then hash each file accordingly.
+    WorkerCount := TThread.ProcessorCount;
+    if WorkerCount < 1 then
+      WorkerCount := 1;
+    if WorkerCount > 4 then
+      WorkerCount := 4;
+    FFileHashPool := TFileHashWorkerPool.Create(WorkerCount,
+      AlgorithmChoiceRadioBox3.ItemIndex);
+    AlgorithmChoiceRadioBox3.Enabled := False;
+    cbLoadHashList.Enabled := False;
+    ScanCompleted := False;
     try
+     try
      FS := TFileSearcher.Create;
 
      // Set parameters for searching for hidden or non-hidden files and dirs
@@ -2613,11 +2644,29 @@ var
            else SearchMask := '';
          FS.Search(LongPathOverride+DirToHash, SearchMask, True, False);
        end;
+     FFileHashPool.FinishInput;
+     DrainFileHashResults(0);
+     FFileHashPool.WaitForWorkers;
+     ScanCompleted := True;
     finally
-     // Hashing complete. Now free resources
      FS.Free;
-     TotalFilesToExamine.Free;
     end;
+    finally
+      if Assigned(FFileHashPool) then
+      begin
+        if not ScanCompleted then
+          FFileHashPool.CancelPending;
+        FFileHashPool.WaitForWorkers;
+        FreeAndNil(FFileHashPool);
+      end;
+      AlgorithmChoiceRadioBox3.Enabled := AlgorithmChoiceWasEnabled;
+      cbLoadHashList.Enabled := HashListOptionWasEnabled;
+      TotalFilesToExamine.Free;
+    end;
+
+    StatusBar1.SimpleText := '';
+    StatusBar2.SimpleText := '';
+    StatusBar3.SimpleText := '';
 
     // Now that the data is all computed, display the grid in the GUI.
     // Update the SQLite database with any remaining commits and display
@@ -2639,6 +2688,9 @@ var
      StatusBar2.SimpleText:= 'See rightmost column for hashset correlations. ' + IntToStr(CountHashesInKnownList) + ' unique hashes are in the imported hash list';
     end;
   end; // end of SelectDirectoryDialog1.Execute
+  finally
+    FFileHashScanActive := False;
+  end;
 end;
 
 // The clipboard button on the 'FileS' tab, this will copy the DBGrid to clipboard
@@ -4878,93 +4930,95 @@ end;
 // Called by TFileSearcher via FileS tab to hash each file
 procedure TMainForm.HashFile(FileIterator: TFileIterator);
 var
-  SizeOfFile : int64;
-  NameOfFileToHashFull, PathOnly, NameOnly, PercentageProgress, NewFileName : string;
-  fileHashValue : ansistring;
-  SG : TStringGrid;
-  DoesHashExistAlready : Boolean;
-  RenamingSuccessfull : Boolean = Default(Boolean);
+  NameOfFileToHashFull: string;
 begin
-  SG            := TStringGrid.Create(self);
-  SizeOfFile    := 0;
-  fileHashValue := '';
-  DoesHashExistAlready := false;
+  if StopScan1 or not Assigned(FFileHashPool) then
+    Exit;
 
-  if StopScan1 = FALSE then    // If Stop button NOT clicked, work
+  NameOfFileToHashFull := FileIterator.FileName;
+  StatusBar2.SimpleText := 'Currently Hashing: ' +
+    RemoveLongPathOverrideChars(NameOfFileToHashFull, '\\?\');
+
+  if FFileHashPool.OutstandingCount >= FFileHashPool.MaximumOutstanding then
+    DrainFileHashResults(FFileHashPool.MaximumOutstanding - 1);
+  if StopScan1 then
+    Exit;
+
+  FFileHashPool.AddFile(NameOfFileToHashFull, FileIterator.Path,
+    FileIterator.FileInfo.Size);
+  Application.ProcessMessages;
+end;
+
+procedure TMainForm.DrainFileHashResults(TargetOutstanding: Integer);
+var
+  HashResult: TFileHashResult;
+begin
+  while Assigned(FFileHashPool) and
+    (FFileHashPool.OutstandingCount > TargetOutstanding) do
+  begin
+    if FFileHashPool.TryGetResult(HashResult) then
     begin
-      NameOfFileToHashFull := FileIterator.FileName;
-      PathOnly   := FileIterator.Path;
-      NameOnly   := ExtractFileName(FileIterator.FileName);
-      SizeOfFile := FileIterator.FileInfo.Size;
-
-      if PageControl1.ActivePage = TabSheet2 then  // File tab
-        begin
-          StatusBar1.SimpleText := 'Currently Hashing: ' + RemoveLongPathOverrideChars(NameOfFileToHashFull, '\\?\');
-        end else
-      if PageControl1.ActivePage = TabSheet3 then  // FileS tab
-        begin
-          StatusBar2.SimpleText := 'Currently Hashing: ' + RemoveLongPathOverrideChars(NameOfFileToHashFull, '\\?\');
-        end else
-      if PageControl1.ActivePage = TabSheet4 then  // Copy tab
-        begin
-          StatusBar3.SimpleText := 'Currently Hashing: ' + RemoveLongPathOverrideChars(NameOfFileToHashFull, '\\?\');
-        end;
-
-    // Now generate the hash value using a custom function and convert the result to uppercase
-    if cbLoadHashList.Checked then
-    begin
-      FileHashValue        := UpperCase(CalcTheHashFile(NameOfFileToHashFull));
-      DoesHashExistAlready := IsHashInTheKnownList(FileHashValue); // We pass this as a flag to SQLIte later
-      // If CRC32 selected, and a request to rename the files was also chosen, do that
-      if RenameFilesWithCRCHashOrNot = true then
-      begin
-        NewFileName := RenameFileWithCRCHash(NameOfFileToHashFull, FileHashValue);
-        RenamingSuccessfull := WriteFilenameWithCRCHash(NameOfFileToHashFull, NewFileName);
-        if RenamingSuccessfull = false then RaiseLastOSError;
+      try
+        ProcessFileHashResult(HashResult);
+      finally
+        HashResult.Free;
       end;
-    end
-      else
-      begin
-        // Compute the hash of the file
-        FileHashValue   := UpperCase(CalcTheHashFile(NameOfFileToHashFull));
-        // If CRC32 selected, and a request to rename the files was also chosen, do that
-        if RenameFilesWithCRCHashOrNot = true then
-        begin
-          NewFileName := RenameFileWithCRCHash(NameOfFileToHashFull, FileHashValue);
-          RenamingSuccessfull := WriteFilenameWithCRCHash(NameOfFileToHashFull, NewFileName);
-          if RenamingSuccessfull = false then RaiseLastOSError;
-        end;
-        {$IFDEF Windows}
-          PathOnly := RemoveLongPathOverrideChars(PathOnly, LongPathOverride); // Remove the \\?\ for display purposes
-        {$ENDIF}
-      end;
-
-    // Save to database
-    if RenameFilesWithCRCHashOrNot = true then
-    begin
-      frmSQLiteDBases.WriteFILESValuesToDatabase(ExtractFileName(NewFileName), PathOnly, FileHashValue, FormatByteSize(SizeOfFile), DoesHashExistAlready);
     end
     else
-    frmSQLiteDBases.WriteFILESValuesToDatabase(NameOnly, PathOnly, FileHashValue, FormatByteSize(SizeOfFile), DoesHashExistAlready);
-    // Periodically commit database changes. If too often, slows it down
-    CommitCount(nil);
-    // Progress Status Elements:
-
-    lblFilesExamined.Caption:= IntToStr(FileCounter);
-    PercentageProgress := IntToStr((FileCounter * 100) DIV NoOfFilesInDir2);
-    lblPercentageComplete.Caption := PercentageProgress + '%';
-    TotalBytesRead := TotalBytesRead + SizeOfFile;
-    lblTotalBytesExamined.Caption := FormatByteSize(TotalBytesRead);
-    pbFileS.Position := ((FileCounter *100) DIV NoOfFilesInDir2);
-
-    Application.ProcessMessages;
-    FileCounter := FileCounter+1;
+    begin
+      Application.ProcessMessages;
+      Sleep(1);
     end;
+  end;
+end;
 
-  StatusBar1.SimpleText := '';
-  StatusBar2.SimpleText := '';
-  StatusBar3.SimpleText := '';
-  SG.Free;
+procedure TMainForm.ProcessFileHashResult(AResult: TFileHashResult);
+var
+  SizeOfFile: Int64;
+  NameOnly, PathOnly, PercentageProgress, NewFileName: string;
+  FileHashValue: string;
+  DoesHashExistAlready, RenamingSuccessful: Boolean;
+begin
+  SizeOfFile := AResult.FileSize;
+  PathOnly := AResult.FilePath;
+  NameOnly := ExtractFileName(AResult.FileName);
+  FileHashValue := UpperCase(AResult.HashValue);
+  DoesHashExistAlready := False;
+  RenamingSuccessful := False;
+  NewFileName := '';
+
+  if cbLoadHashList.Checked then
+    DoesHashExistAlready := IsHashInTheKnownList(FileHashValue);
+
+  if RenameFilesWithCRCHashOrNot and
+    (Pos('ERROR: ', FileHashValue) <> 1) then
+  begin
+    NewFileName := RenameFileWithCRCHash(AResult.FileName, FileHashValue);
+    RenamingSuccessful := WriteFilenameWithCRCHash(AResult.FileName, NewFileName);
+    if not RenamingSuccessful then
+      RaiseLastOSError;
+  end;
+
+  {$IFDEF Windows}
+  if not cbLoadHashList.Checked then
+    PathOnly := RemoveLongPathOverrideChars(PathOnly, FFileHashLongPathOverride);
+  {$ENDIF}
+
+  if RenamingSuccessful then
+    frmSQLiteDBases.WriteFILESValuesToDatabase(ExtractFileName(NewFileName),
+      PathOnly, FileHashValue, FormatByteSize(SizeOfFile), DoesHashExistAlready)
+  else
+    frmSQLiteDBases.WriteFILESValuesToDatabase(NameOnly, PathOnly, FileHashValue,
+      FormatByteSize(SizeOfFile), DoesHashExistAlready);
+
+  CommitCount(nil);
+  lblFilesExamined.Caption := IntToStr(FileCounter);
+  PercentageProgress := IntToStr((FileCounter * 100) DIV NoOfFilesInDir2);
+  lblPercentageComplete.Caption := PercentageProgress + '%';
+  TotalBytesRead := TotalBytesRead + SizeOfFile;
+  lblTotalBytesExamined.Caption := FormatByteSize(TotalBytesRead);
+  pbFileS.Position := (FileCounter * 100) DIV NoOfFilesInDir2;
+  Inc(FileCounter);
 end;
 
 procedure TMainForm.lblURLBannerClick(Sender: TObject);
@@ -5975,4 +6029,3 @@ end;
 initialization
 
 end.
-

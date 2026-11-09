@@ -76,9 +76,9 @@ program quickhash;
 {$mode objfpc}{$H+}
 
 uses
-  {$IFDEF UNIX}{$IFDEF UseCThreads}
+  {$IFDEF UNIX}
   cthreads,
-  {$ENDIF}{$ENDIF}
+  {$ENDIF}
   Interfaces, // this includes the LCL widgetset
   //FindAllFilesEnhanced, uKnownHashLists,
   Forms, lazdbexport, uDisplayGrid, udisplaygrid3, Unit2, dbases_sqlite,
@@ -112,5 +112,4 @@ begin
   //Application.CreateForm(TfrmEnvironmentCheck, frmEnvironmentCheck);
   Application.Run;
 end.
-
 
