@@ -3,7 +3,11 @@
 
 Unreleased
 ----------
+v3.5.0 - Nov 2026
+
 Added xxHash3 (64-bit) as an algorithm option for text, file, and disk hashing.
+Replaced legacy classes TFileStreamUTF8 to TFileStream, TStringListUTF8 to TStringList
+
 
 v3.3.4 - Oct 2023
 

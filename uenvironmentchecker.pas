@@ -112,7 +112,7 @@ function TfrmEnvironmentCheck.DLLScan(expectedPath : rawbytestring) : Boolean;
   sqlite3-win32.dll		220680d789e002bf2822aa3ef428d2af01496033
   sqlite3-win64.dll		c82d5cfe8ffb243a670d65258c25e9c101820ab7
   zlib1.dll (32-bit copy)	B1D1FECBB568EDCF712232738BA3805B47BC6036
-  zlib1.dll (64-bit copy)	A10687C37DEB2CE5422140B541A64AC15534250F
+  zlib1.dll (64-bit copy)	A68E78557261400F4776D518505561BE0AA14884
   // On Linux :
   libewf-Linux-x64.so           2376C9092754ABF401CFA1D17C00801DAAB4D143
   }
@@ -142,7 +142,7 @@ begin
                       'libgcc_s_dw2-1.dll'	   + #9#9 + '201924954A5A593C4CA24EE0FE799A764B41598D' + Lineending +
                       'libwinpthread-1.dll'        + #9#9 + '34E84ED8F69F05FCAD212B02C2B064A5C7377904' + Lineending +
                       'sqlite3-win64.dll'	   + #9#9 + 'C82D5CFE8FFB243A670D65258C25E9C101820AB7' + Lineending +
-                      'zlib1.dll (x64 copy)'	   + #9#9 + 'A10687C37DEB2CE5422140B541A64AC15534250F' + Lineending +
+                      'zlib1.dll (x64 copy)'	   + #9#9 + 'A68E78557261400F4776D518505561BE0AA14884' + Lineending +
                       '========================================================================='      + Lineending;
     {$endif}
   {$endif}

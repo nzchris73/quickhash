@@ -946,7 +946,7 @@ var
   FileHashCell  : string = Default(string);
   FileSizeCell  : string = Default(string);
   KnownHashCell : string = Default(string);
-  CSVFileToWrite: TFilestreamUTF8;
+  CSVFileToWrite: TFilestream;
   ExportSQLQuery: TSQLQuery;
   n             : integer = Default(integer);
   KnownHashFlagIsSet : boolean = Default(boolean);
@@ -1047,7 +1047,7 @@ var
   DestinationFileHash : string = Default(string);
   DateAttributes      : string = Default(string);
   n                   : integer = Default(integer);
-  CSVFileToWrite      : TFilestreamUTF8;
+  CSVFileToWrite      : TFilestream;
   ExportSQLQuery      : TSQLQuery;
 
 begin
@@ -1107,7 +1107,7 @@ begin
       ExportSQLQuery.free; // Free the temp SQL Query
     end; // End of SQLQuery.Create
   finally
-   CSVFileToWrite.Free;
+   CSVFileToWrite.free;
    Mainform.StatusBar2.SimpleText := 'DONE';
    ShowMessage('Grid data now in ' + Filename);
   end;
@@ -1128,7 +1128,7 @@ var
   FileHashB   : string = Default(string);
 
   n : integer = Default(integer);
-  CSVFileToWrite : TFilestreamUTF8;
+  CSVFileToWrite : TFilestream;
   ExportSQLQuery : TSQLQuery;
 begin
   Mainform.StatusBar2.SimpleText := 'Writing results to file...please wait';
