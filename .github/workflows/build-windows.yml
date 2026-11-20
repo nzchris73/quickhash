@@ -2,9 +2,9 @@ name: Build Windows Pascal App
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "add-xxhash3" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "add-xxhash3" ]
 
 jobs:
   build:
