@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install Lazarus (includes FPC)
-        run: choco install lazarus -y
+        run: choco install lazarus --version=2.2.6 -y
 
       - name: Add FPC to PATH
         run: |
@@ -26,10 +26,14 @@ jobs:
         run: echo "C:\lazarus" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Build Lazarus project
-        run: lazbuild --build-mode=Release quickhash.lpi
+        run: |
+          lazbuild --add-package-link HashLib4Pascal/src/Packages/FPC/HashLib4PascalPackage.lpk
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          lazbuild quickhash.lpi
 
       - name: Upload Windows executable
         uses: actions/upload-artifact@v4
         with:
           name: windows-pascal-app
-          path: app.exe
+          path: Quickhash-GUI.exe
+          if-no-files-found: error
