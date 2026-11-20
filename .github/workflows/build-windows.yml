@@ -1,0 +1,35 @@
+name: Build Windows Pascal App
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Lazarus (includes FPC)
+        run: choco install lazarus -y
+
+      - name: Add FPC to PATH
+        run: |
+          $fpcPath = (Get-ChildItem -Path "C:\lazarus\fpc\*\bin\*" -Directory | Select-Object -First 1).FullName
+          echo "$fpcPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Add Lazarus to PATH
+        run: echo "C:\lazarus" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Build Lazarus project
+        run: lazbuild --build-mode=Release quickhash.lpi
+
+      - name: Upload Windows executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-pascal-app
+          path: app.exe
